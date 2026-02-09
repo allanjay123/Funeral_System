@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Care | System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --main: #00b894; --sidebar-bg: #0f1423; --bg: #f5f6fa; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; }
+        
+        /* SIDEBAR (SELLIO STYLE) */
+        .sidebar { width: 250px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; font-size: 22px; font-weight: 900; color: var(--main); letter-spacing: 1px; }
+        .sidebar-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #8a8d93; transition: 0.3s; }
+        .sidebar-item:hover, .active { background: rgba(0,184,148,0.1); color: var(--main); border-right: 4px solid var(--main); }
+
+        /* CONTENT Area */
+        .content { flex: 1; padding: 30px; overflow-y: auto; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; color: var(--sidebar-bg); display: flex; align-items: center; gap: 10px; }
+
+        /* GRID FOR USER FORM */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
+        .btn-save { background: var(--main); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+
+        /* ADMIN TABLE */
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 13px; color: #888; border-bottom: 2px solid #eee; }
+        td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
+        .badge { padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; }
+        .delete-btn { color: #ff4757; cursor: pointer; border: none; background: none; font-size: 16px; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-brand">SELLIO <span style="color:white; font-size: 12px;">FUNERAL</span></div>
+        <div class="sidebar-item active" id="menu-text"><i class="fas fa-th-large"></i><span>Dashboard</span></div>
+        <div class="sidebar-item" onclick="logout()" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+    </div>
+
+    <div class="content">
+        <div id="header-area" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
+            <h1 id="main-title" style="margin:0;">Dashboard</h1>
+            <div style="background: white; padding: 10px 20px; border-radius: 10px; font-weight: bold;">
+                <i class="fas fa-user-circle"></i> <span id="user-name"></span>
+            </div>
+        </div>
+
+        <div id="user-view" style="display: none;">
+            <div class="form-grid">
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-user-edit"></i> Personal Details</div>
+                    <div class="form-group"><label>Name of Deceased</label><input type="text" id="d-name" placeholder="Juan Dela Cruz"></div>
+                    <div class="form-group"><label>Contact Person Number</label><input type="text" id="d-phone" placeholder="0912-xxx-xxxx"></div>
+                    <div class="form-group"><label>Send Location (Address)</label><textarea id="d-loc" rows="2"></textarea></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-box"></i> Coffin & Karo</div>
+                    <div class="form-group">
+                        <label>Select Coffin</label>
+                        <select id="d-coffin"><option>Metal Elite (P50,000)</option><option>Solid Wood (P30,000)</option><option>Standard (P15,000)</option></select>
+                    </div>
+                    <div class="form-group"><label>Custom Color</label><input type="color" id="d-color" value="#ffffff" style="height: 45px; padding: 5px;"></div>
+                    <div class="form-group">
+                        <label>Karo (Vehicle)</label>
+                        <select id="d-karo"><option>White Cadillac Hearse</option><option>Classic Horse Carriage</option><option>Modern Van</option></select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-tshirt"></i> Custom Attire</div>
+                    <div class="form-group">
+                        <label>Clothing Type</label>
+                        <select id="d-attire"><option>Custom Barong</option><option>Formal Dress / Gown</option></select>
+                    </div>
+                    <div class="form-group"><label>Shoes Size</label><input type="number" id="d-shoes"></div>
+                    <div class="form-group">
+                        <label>Flowers Arrangement</label>
+                        <select id="d-flowers"><option>Set A (Lilies & Mums)</option><option>Set B (Roses & Orchids)</option></select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-credit-card"></i> Payment & Submit</div>
+                    <div class="form-group">
+                        <label>Payment Mode</label>
+                        <select id="d-pay"><option>G-Cash (09123456789)</option><option>Cash on Counter</option></select>
+                    </div>
+                    <p style="font-size: 11px; color: #888;">*By clicking save, you agree to our funeral terms.</p>
+                    <button class="btn-save" onclick="saveData()">CONFIRM REGISTRATION</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="admin-view" style="display: none;">
+            <div class="card">
+                <div class="section-title"><i class="fas fa-list"></i> Registered Funeral Appointments</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Deceased Name</th>
+                                <th>Coffin/Karo</th>
+                                <th>Payment</th>
+                                <th>Location</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="admin-table-body">
+                            </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const session = JSON.parse(localStorage.getItem('loginSession'));
+
+        window.onload = function() {
+            if(!session) window.location.href = 'index.html';
+            document.getElementById('user-name').innerText = session.name;
+
+            if(session.role === 'admin') {
+                document.getElementById('admin-view').style.display = 'block';
+                document.getElementById('main-title').innerText = "Admin Management";
+                document.getElementById('menu-text').innerHTML = '<i class="fas fa-file-invoice"></i> Records';
+                loadAdminData();
+            } else {
+                document.getElementById('user-view').style.display = 'block';
+                document.getElementById('main-title').innerText = "Book an Appointment";
+            }
+        };
+
+        function saveData() {
+            const entry = {
+                id: Date.now(),
+                name: document.getElementById('d-name').value,
+                phone: document.getElementById('d-phone').value,
+                loc: document.getElementById('d-loc').value,
+                coffin: document.getElementById('d-coffin').value,
+                color: document.getElementById('d-color').value,
+                karo: document.getElementById('d-karo').value,
+                pay: document.getElementById('d-pay').value,
+                date: new Date().toLocaleDateString()
+            };
+
+            if(!entry.name) return alert("Please enter deceased name");
+
+            let list = JSON.parse(localStorage.getItem('funeral_data')) || [];
+            list.push(entry);
+            localStorage.setItem('funeral_data', JSON.stringify(list));
+            alert("Success! Your registration has been sent to the Admin.");
+            location.reload();
+        }
+
+        function loadAdminData() {
+            const list = JSON.parse(localStorage.getItem('funeral_data')) || [];
+            const body = document.getElementById('admin-table-body');
+            body.innerHTML = list.map(item => `
+                <tr>
+                    <td><b>${item.name}</b><br><small>${item.phone}</small></td>
+                    <td>${item.coffin} <br> <span style="font-size:10px; color:#888;">Vehicle: ${item.karo}</span></td>
+                    <td><span class="badge" style="background:#e3fcef; color:#00b894;">${item.pay}</span></td>
+                    <td style="font-size:11px;">${item.loc}</td>
+                    <td><span style="font-size:10px; color:#888;">${item.date}</span></td>
+                    <td><button class="delete-btn" onclick="deleteEntry(${item.id})"><i class="fas fa-trash-alt"></i></button></td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteEntry(id) {
+            if(confirm("Are you sure you want to delete this record?")) {
+                let list = JSON.parse(localStorage.getItem('funeral_data')) || [];
+                list = list.filter(i => i.id !== id);
+                localStorage.setItem('funeral_data', JSON.stringify(list));
+                loadAdminData();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('loginSession');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+  </html>
+  
