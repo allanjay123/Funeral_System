@@ -1,20 +1,72 @@
 <!DOCTYPE html>
-<html>
-<head><link rel="stylesheet" href="style.css"></head>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Care | Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --isu-green: #00b894; --isu-dark: #1e272e; --bg: #f5f6fa; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--isu-dark); display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .auth-card { background: white; padding: 40px; border-radius: 15px; width: 100%; max-width: 350px; text-align: center; }
+        .auth-card h2 { color: var(--isu-dark); margin-bottom: 20px; }
+        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; background: var(--isu-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .toggle { margin-top: 15px; font-size: 13px; color: #666; cursor: pointer; text-decoration: underline; }
+        .hidden { display: none; }
+    </style>
+</head>
 <body>
-    <nav>
-        <div>🕊️ Everlasting Memorials</div>
-        <div>
-            <a href="index.html">Home</a>
-            <button onclick="adminLogin()" class="btn-admin">Admin</button>
+    <div class="auth-card">
+        <i class="fas fa-dove" style="font-size: 40px; color: var(--isu-green); margin-bottom: 10px;"></i>
+        <div id="login-box">
+            <h2>User Login</h2>
+            <input type="text" id="log-id" placeholder="Student ID / Username">
+            <input type="password" id="log-pass" placeholder="Password">
+            <button class="btn" onclick="login()">LOGIN</button>
+            <div class="toggle" onclick="toggleAuth()">No account? Register</div>
         </div>
-    </nav>
-    <div class="container" style="text-align:center;">
-        <h1>Serbisyong Mapagkalinga</h1>
-        <p>Kumpletong pakete para sa marangal na paghahatid.</p>
-        <button onclick="window.location.href='step1_coffin.html'" class="btn-next" style="width:auto; padding:15px 50px;">Simulan ang Pagpili</button>
+        <div id="reg-box" class="hidden">
+            <h2>Register</h2>
+            <input type="text" id="reg-name" placeholder="Full Name">
+            <input type="text" id="reg-id" placeholder="Username">
+            <input type="password" id="reg-pass" placeholder="Password">
+            <button class="btn" onclick="register()">CREATE ACCOUNT</button>
+            <div class="toggle" onclick="toggleAuth()">Have account? Login</div>
+        </div>
     </div>
-    <script src="main.js"></script>
+
+    <script>
+        function toggleAuth() {
+            document.getElementById('login-box').classList.toggle('hidden');
+            document.getElementById('reg-box').classList.toggle('hidden');
+        }
+        function register() {
+            const name = document.getElementById('reg-name').value;
+            const id = document.getElementById('reg-id').value;
+            const pass = document.getElementById('reg-pass').value;
+            if(!name || !id || !pass) return alert("Fill all fields");
+            let users = JSON.parse(localStorage.getItem('funeral_users')) || [];
+            users.push({name, id, pass, role: 'user'});
+            localStorage.setItem('funeral_users', JSON.stringify(users));
+            alert("Registered! Please login.");
+            toggleAuth();
+        }
+        function login() {
+            const id = document.getElementById('log-id').value;
+            const pass = document.getElementById('log-pass').value;
+            if(id === 'admin' && pass === 'admin123') {
+                localStorage.setItem('currentUser', JSON.stringify({name: 'Admin', role: 'admin'}));
+                window.location.href = 'dashboard.html';
+                return;
+            }
+            let users = JSON.parse(localStorage.getItem('funeral_users')) || [];
+            const user = users.find(u => u.id === id && u.pass === pass);
+            if(user) {
+                localStorage.setItem('currentUser', JSON.stringify(user));
+                window.location.href = 'dashboard.html';
+            } else { alert("Invalid credentials"); }
+        }
+    </script>
 </body>
 </html>
-
