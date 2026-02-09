@@ -3,69 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eternal Care | Login</title>
+    <title>Eternal Care | Portal</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --isu-green: #00b894; --isu-dark: #1e272e; --bg: #f5f6fa; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--isu-dark); display: flex; align-items: center; justify-content: center; height: 100vh; }
-        .auth-card { background: white; padding: 40px; border-radius: 15px; width: 100%; max-width: 350px; text-align: center; }
-        .auth-card h2 { color: var(--isu-dark); margin-bottom: 20px; }
+        :root { --main: #00b894; --dark: #0f1423; }
+        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--dark); display: flex; align-items: center; justify-content: center; height: 100vh; color: white; }
+        .portal-container { text-align: center; width: 100%; max-width: 400px; padding: 20px; }
+        .login-card { background: white; padding: 30px; border-radius: 20px; color: #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; }
+        .login-card.active { display: block; animation: fadeIn 0.5s; }
+        .choice-box { display: flex; gap: 20px; justify-content: center; margin-top: 20px; }
+        .role-btn { background: #1e272e; padding: 20px; border-radius: 15px; cursor: pointer; transition: 0.3s; flex: 1; border: 2px solid transparent; }
+        .role-btn:hover { border-color: var(--main); background: #2f3640; }
+        .role-btn i { font-size: 30px; color: var(--main); display: block; margin-bottom: 10px; }
         input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; background: var(--isu-green); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .toggle { margin-top: 15px; font-size: 13px; color: #666; cursor: pointer; text-decoration: underline; }
-        .hidden { display: none; }
+        .btn { width: 100%; padding: 12px; background: var(--main); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        .back-btn { margin-top: 15px; display: block; font-size: 13px; color: #666; cursor: pointer; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
-    <div class="auth-card">
-        <i class="fas fa-dove" style="font-size: 40px; color: var(--isu-green); margin-bottom: 10px;"></i>
-        <div id="login-box">
-            <h2>User Login</h2>
-            <input type="text" id="log-id" placeholder="Student ID / Username">
-            <input type="password" id="log-pass" placeholder="Password">
-            <button class="btn" onclick="login()">LOGIN</button>
-            <div class="toggle" onclick="toggleAuth()">No account? Register</div>
+
+    <div class="portal-container">
+        <div id="role-selection">
+            <i class="fas fa-dove" style="font-size: 50px; color: var(--main); margin-bottom: 20px;"></i>
+            <h1>Eternal Care System</h1>
+            <p>Please select your login type</p>
+            <div class="choice-box">
+                <div class="role-btn" onclick="showLogin('user')"><i class="fas fa-user"></i><span>User / Client</span></div>
+                <div class="role-btn" onclick="showLogin('admin')"><i class="fas fa-user-shield"></i><span>Administrator</span></div>
+            </div>
         </div>
-        <div id="reg-box" class="hidden">
-            <h2>Register</h2>
-            <input type="text" id="reg-name" placeholder="Full Name">
-            <input type="text" id="reg-id" placeholder="Username">
-            <input type="password" id="reg-pass" placeholder="Password">
-            <button class="btn" onclick="register()">CREATE ACCOUNT</button>
-            <div class="toggle" onclick="toggleAuth()">Have account? Login</div>
+
+        <div id="login-card" class="login-card">
+            <h2 id="login-title">Login</h2>
+            <input type="text" id="username" placeholder="Username">
+            <input type="password" id="password" placeholder="Password">
+            <button class="btn" onclick="handleLogin()">LOGIN</button>
+            <span class="back-btn" onclick="location.reload()"><i class="fas fa-arrow-left"></i> Back to selection</span>
         </div>
     </div>
 
     <script>
-        function toggleAuth() {
-            document.getElementById('login-box').classList.toggle('hidden');
-            document.getElementById('reg-box').classList.toggle('hidden');
+        let selectedRole = '';
+
+        function showLogin(role) {
+            selectedRole = role;
+            document.getElementById('role-selection').style.display = 'none';
+            document.getElementById('login-card').classList.add('active');
+            document.getElementById('login-title').innerText = role === 'admin' ? 'Admin Login' : 'User Login';
         }
-        function register() {
-            const name = document.getElementById('reg-name').value;
-            const id = document.getElementById('reg-id').value;
-            const pass = document.getElementById('reg-pass').value;
-            if(!name || !id || !pass) return alert("Fill all fields");
-            let users = JSON.parse(localStorage.getItem('funeral_users')) || [];
-            users.push({name, id, pass, role: 'user'});
-            localStorage.setItem('funeral_users', JSON.stringify(users));
-            alert("Registered! Please login.");
-            toggleAuth();
-        }
-        function login() {
-            const id = document.getElementById('log-id').value;
-            const pass = document.getElementById('log-pass').value;
-            if(id === 'admin' && pass === 'admin123') {
-                localStorage.setItem('currentUser', JSON.stringify({name: 'Admin', role: 'admin'}));
-                window.location.href = 'dashboard.html';
-                return;
+
+        function handleLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if(selectedRole === 'admin') {
+                if(u === 'admin' && p === 'admin123') {
+                    localStorage.setItem('loginSession', JSON.stringify({role: 'admin', name: 'System Admin'}));
+                    window.location.href = 'system.html';
+                } else { alert("Wrong Admin Credentials"); }
+            } else {
+                if(u && p) { // Simplest login for user
+                    localStorage.setItem('loginSession', JSON.stringify({role: 'user', name: u}));
+                    window.location.href = 'system.html';
+                } else { alert("Please enter username and password"); }
             }
-            let users = JSON.parse(localStorage.getItem('funeral_users')) || [];
-            const user = users.find(u => u.id === id && u.pass === pass);
-            if(user) {
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                window.location.href = 'dashboard.html';
-            } else { alert("Invalid credentials"); }
         }
     </script>
 </body>
