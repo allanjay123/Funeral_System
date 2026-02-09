@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eternal Care | System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root { --main-green: #00b894; --sidebar-bg: #0f1423; --card-bg: #ffffff; --text: #2c3e50; }
+        body { margin: 0; font-family: 'Segoe UI', sans-serif; display: flex; background: #f0f2f5; height: 100vh; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 240px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; display: flex; align-items: center; gap: 10px; font-size: 20px; font-weight: bold; }
+        .sidebar-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; transition: 0.3s; color: #a4b0be; }
+        .sidebar-item:hover, .active { background: rgba(0,184,148,0.1); color: var(--main-green); border-left: 4px solid var(--main-green); }
+
+        /* CONTENT Area */
+        .main-content { flex: 1; overflow-y: auto; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 12px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+
+        /* FORM Style */
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-size: 12px; color: #666; margin-bottom: 5px; }
+        select, input, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; }
+        .btn-submit { background: var(--main-green); color: white; border: none; padding: 12px; border-radius: 6px; width: 100%; cursor: pointer; font-weight: bold; }
+
+        /* ADMIN TABLE */
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { text-align: left; padding: 12px; border-bottom: 1px solid #eee; font-size: 13px; }
+        .action-btn { padding: 5px 10px; border-radius: 4px; border: none; cursor: pointer; font-size: 11px; }
+        .delete-btn { background: #ff7675; color: white; }
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <div class="sidebar-brand"><i class="fas fa-dove"></i> ETERNAL</div>
+        <div class="sidebar-item active" onclick="showTab('register')"><i class="fas fa-edit"></i> Registration</div>
+        <div class="sidebar-item" id="admin-tab" onclick="showTab('records')"><i class="fas fa-file-invoice"></i> Admin Records</div>
+        <div class="sidebar-item" onclick="logout()" style="margin-top: auto; color: #ff7675;"><i class="fas fa-sign-out-alt"></i> Logout</div>
+    </div>
+
+    <div class="main-content">
+        <div class="header">
+            <h2 id="tab-title">Funeral Registration</h2>
+            <div style="font-size: 14px; font-weight: bold;">User: <span id="user-display" style="color: var(--main-green);"></span></div>
+        </div>
+
+        <div id="register-section" class="tab-content">
+            <div class="grid">
+                <div class="card">
+                    <div class="section-title">Personal Details</div>
+                    <div class="form-group"><label>Full Name of Deceased</label><input type="text" id="f-name"></div>
+                    <div class="form-group"><label>Personal Contact Number</label><input type="text" id="f-phone"></div>
+                    <div class="form-group"><label>Send Location (Address)</label><textarea id="f-location"></textarea></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Customization</div>
+                    <div class="form-group">
+                        <label>Choose Coffin & Size</label>
+                        <select id="f-coffin"><option>Wood - Standard</option><option>Metal - Elite</option><option>Marble - Premium</option></select>
+                    </div>
+                    <div class="form-group"><label>Coffin Color</label><input type="color" id="f-color" value="#ffffff"></div>
+                    <div class="form-group">
+                        <label>Karo / Funeral Vehicle</label>
+                        <select id="f-karo"><option>Classic Hearse</option><option>Modern SUV</option><option>Horse Carriage</option></select>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Flowers & Tarpaulin</div>
+                    <div class="form-group">
+                        <label>Flower Arrangement</label>
+                        <select id="f-flowers"><option>White Lilies (Set A)</option><option>Mums & Roses (Set B)</option></select>
+                    </div>
+                    <div class="form-group"><label>Tarpaulin Design/Message</label><textarea id="f-tarp" placeholder="Memory of..."></textarea></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Clothing (Barong/Dress)</div>
+                    <div class="form-group">
+                        <label>Attire Type</label>
+                        <select id="f-attire"><option>Custom Barong Tagalog</option><option>Custom White Gown</option></select>
+                    </div>
+                    <div class="form-group"><label>Shoe Size</label><input type="number" id="f-shoes"></div>
+                </div>
+
+                <div class="card">
+                    <div class="section-title">Payment & Contact</div>
+                    <div class="form-group">
+                        <label>Payment Method</label>
+                        <select id="f-payment"><option>G-Cash (0912-345-6789)</option><option>Cash at Funeral Home</option></select>
+                    </div>
+                    <div class="form-group"><label>Funeral Hotline</label><input type="text" value="0922-ETERNAL-00" disabled></div>
+                    <button class="btn-submit" onclick="submitRegistration()">SUBMIT REGISTRATION</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="records-section" class="tab-content" style="display: none;">
+            <div class="card">
+                <div class="section-title">Official Funeral Records (CRUD)</div>
+                <div style="overflow-x: auto;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Coffin</th>
+                                <th>Karo</th>
+                                <th>Payment</th>
+                                <th>Location</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+        
+        window.onload = function() {
+            if(!currentUser) window.location.href = 'index.html';
+            document.getElementById('user-display').innerText = currentUser.name;
+            
+            // Hide Admin tab if not admin
+            if(currentUser.role !== 'admin') {
+                document.getElementById('admin-tab').style.display = 'none';
+            }
+            loadRecords();
+        };
+
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+            
+            if(tab === 'register') {
+                document.getElementById('register-section').style.display = 'block';
+                document.getElementById('tab-title').innerText = "Funeral Registration";
+            } else {
+                document.getElementById('records-section').style.display = 'block';
+                document.getElementById('tab-title').innerText = "Admin Management";
+                loadRecords();
+            }
+        }
+
+        function submitRegistration() {
+            const data = {
+                id: Date.now(),
+                name: document.getElementById('f-name').value,
+                phone: document.getElementById('f-phone').value,
+                location: document.getElementById('f-location').value,
+                coffin: document.getElementById('f-coffin').value,
+                color: document.getElementById('f-color').value,
+                karo: document.getElementById('f-karo').value,
+                flowers: document.getElementById('f-flowers').value,
+                tarp: document.getElementById('f-tarp').value,
+                attire: document.getElementById('f-attire').value,
+                shoes: document.getElementById('f-shoes').value,
+                payment: document.getElementById('f-payment').value,
+                user: currentUser.name
+            };
+
+            if(!data.name) return alert("Please enter the deceased name");
+
+            let records = JSON.parse(localStorage.getItem('funeral_records')) || [];
+            records.push(data);
+            localStorage.setItem('funeral_records', JSON.stringify(records));
+            alert("Registration Submitted Successfully!");
+            location.reload();
+        }
+
+        function loadRecords() {
+            let records = JSON.parse(localStorage.getItem('funeral_records')) || [];
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td><b>${r.name}</b></td>
+                    <td>${r.coffin} (<span style="color:${r.color}">■</span>)</td>
+                    <td>${r.karo}</td>
+                    <td>${r.payment}</td>
+                    <td>${r.location.substring(0, 20)}...</td>
+                    <td>
+                        <button class="action-btn delete-btn" onclick="deleteRecord(${r.id})">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function deleteRecord(id) {
+            if(!confirm("Are you sure you want to delete this record?")) return;
+            let records = JSON.parse(localStorage.getItem('funeral_records')) || [];
+            records = records.filter(r => r.id !== id);
+            localStorage.setItem('funeral_records', JSON.stringify(records));
+            loadRecords();
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+    </script>
+</body>
+</html>
