@@ -3,119 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eternal Care | System</title>
+    <title>Eternal Care Elite | System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --main: #00b894; --sidebar-bg: #0f1423; --bg: #f5f6fa; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); display: flex; height: 100vh; }
+        :root { --main: #00b894; --sidebar: #0f1423; --bg: #f8f9fc; }
+        body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); color: #333; }
         
-        /* SIDEBAR (SELLIO STYLE) */
-        .sidebar { width: 250px; background: var(--sidebar-bg); color: white; display: flex; flex-direction: column; padding: 20px 0; }
-        .sidebar-brand { padding: 0 25px 30px; font-size: 22px; font-weight: 900; color: var(--main); letter-spacing: 1px; }
-        .sidebar-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #8a8d93; transition: 0.3s; }
-        .sidebar-item:hover, .active { background: rgba(0,184,148,0.1); color: var(--main); border-right: 4px solid var(--main); }
+        .sidebar { width: 260px; background: var(--sidebar); color: white; display: flex; flex-direction: column; padding: 20px 0; }
+        .sidebar-brand { padding: 0 25px 30px; font-size: 24px; font-weight: 900; color: var(--main); }
+        .sidebar-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #a4b0be; transition: 0.3s; }
+        .sidebar-item:hover, .active { background: rgba(0,184,148,0.15); color: var(--main); border-right: 4px solid var(--main); }
 
-        /* CONTENT Area */
         .content { flex: 1; padding: 30px; overflow-y: auto; }
-        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); margin-bottom: 20px; }
-        .section-title { font-size: 18px; font-weight: bold; margin-bottom: 20px; color: var(--sidebar-bg); display: flex; align-items: center; gap: 10px; }
+        .card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
+        
+        /* FEATURE 3: PACKAGE STYLE */
+        .package-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
+        .package-card { border: 2px solid #eee; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .package-card:hover, .package-selected { border-color: var(--main); background: #f0fffb; }
+        .package-card h4 { margin: 10px 0; color: var(--sidebar); }
+        .package-price { font-weight: 900; color: var(--main); font-size: 1.2rem; }
 
-        /* GRID FOR USER FORM */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        /* FEATURE 5: MAP STYLE */
+        #map { height: 250px; border-radius: 12px; margin-top: 10px; border: 2px solid #eee; }
+
+        /* ANALYTICS GRID */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
+        .stat-box { background: white; padding: 20px; border-radius: 12px; border-bottom: 4px solid var(--main); }
+        .stat-val { font-size: 24px; font-weight: 900; display: block; }
+        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
+
         .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 5px; color: #666; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-family: inherit; }
-        .btn-save { background: var(--main); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 10px; }
+        label { display: block; font-size: 11px; font-weight: 800; color: #666; margin-bottom: 5px; text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        
+        .btn-main { background: var(--main); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
+        .btn-main:hover { background: #009476; transform: translateY(-2px); }
 
-        /* ADMIN TABLE */
         table { width: 100%; border-collapse: collapse; }
-        th { background: #f8f9fa; padding: 15px; text-align: left; font-size: 13px; color: #888; border-bottom: 2px solid #eee; }
+        th { text-align: left; padding: 15px; color: #888; font-size: 12px; border-bottom: 2px solid #f4f4f4; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-        .badge { padding: 5px 10px; border-radius: 5px; font-size: 11px; font-weight: bold; }
-        .delete-btn { color: #ff4757; cursor: pointer; border: none; background: none; font-size: 16px; }
+
+        
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-brand">SELLIO <span style="color:white; font-size: 12px;">FUNERAL</span></div>
-        <div class="sidebar-item active" id="menu-text"><i class="fas fa-th-large"></i><span>Dashboard</span></div>
-        <div class="sidebar-item" onclick="logout()" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
+        <div class="sidebar-brand">SELLIO <span style="color:white; font-size: 12px;">PRO</span></div>
+        <div class="sidebar-item active" id="nav-dash" onclick="location.reload()"><i class="fas fa-chart-pie"></i><span>Dashboard</span></div>
+        <div class="sidebar-item" onclick="logout()" style="margin-top: auto;"><i class="fas fa-power-off"></i><span>Logout</span></div>
     </div>
 
     <div class="content">
-        <div id="header-area" style="margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center;">
-            <h1 id="main-title" style="margin:0;">Dashboard</h1>
-            <div style="background: white; padding: 10px 20px; border-radius: 10px; font-weight: bold;">
-                <i class="fas fa-user-circle"></i> <span id="user-name"></span>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <h1 id="view-title">Funeral Hub</h1>
+            <div id="user-tag" style="background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: bold; font-size: 14px;"></div>
+        </div>
+
+        <div id="user-view" style="display:none;">
+            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+                <div>
+                    <div class="card">
+                        <div style="font-weight: 900; margin-bottom: 20px;"><i class="fas fa-layer-group"></i> FEATURE 3: SELECT PACKAGE</div>
+                        <div class="package-container">
+                            <div class="package-card" onclick="selectPkg('Bronze', 25000, this)">
+                                <i class="fas fa-medal" style="color:#cd7f32"></i>
+                                <h4>BRONZE</h4>
+                                <span class="package-price">₱25k</span>
+                                <p style="font-size: 10px;">Wood Coffin + Basic Karo</p>
+                            </div>
+                            <div class="package-card" onclick="selectPkg('Gold', 55000, this)">
+                                <i class="fas fa-medal" style="color:#facc15"></i>
+                                <h4>GOLD</h4>
+                                <span class="package-price">₱55k</span>
+                                <p style="font-size: 10px;">Metal Coffin + Modern Hearse</p>
+                            </div>
+                            <div class="package-card" onclick="selectPkg('Elite', 120000, this)">
+                                <i class="fas fa-crown" style="color:#00b894"></i>
+                                <h4>ELITE</h4>
+                                <span class="package-price">₱120k</span>
+                                <p style="font-size: 10px;">Premium Marble + Limousine</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Full Name of Deceased</label>
+                            <input type="text" id="reg-name" placeholder="Enter name...">
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div style="font-weight: 900; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> FEATURE 5: PIN LOCATION</div>
+                        <p style="font-size: 12px; color: #666;">Drag the map to pinpoint the exact location for the service.</p>
+                        <div id="map"></div>
+                        <input type="hidden" id="reg-coords">
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div style="font-weight: 900; margin-bottom: 20px;">Order Summary</div>
+                    <div class="form-group"><label>Attire Customization</label><select id="reg-attire"><option>Barong Tagalog</option><option>White Gown</option></select></div>
+                    <div class="form-group"><label>Payment Method</label><select id="reg-pay"><option>G-Cash (0912-345-6789)</option><option>Bank Transfer</option></select></div>
+                    <div id="summary-box" style="background: #f8f9fc; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                        <div style="display:flex; justify-content: space-between;"><span>Package:</span> <b id="sum-pkg">-</b></div>
+                        <div style="display:flex; justify-content: space-between; margin-top: 10px;"><span>Total:</span> <b id="sum-price" style="color:var(--main)">₱0</b></div>
+                    </div>
+                    <button class="btn-main" onclick="processOrder()">PLACE BOOKING</button>
+                </div>
             </div>
         </div>
 
-        <div id="user-view" style="display: none;">
-            <div class="form-grid">
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-user-edit"></i> Personal Details</div>
-                    <div class="form-group"><label>Name of Deceased</label><input type="text" id="d-name" placeholder="Juan Dela Cruz"></div>
-                    <div class="form-group"><label>Contact Person Number</label><input type="text" id="d-phone" placeholder="0912-xxx-xxxx"></div>
-                    <div class="form-group"><label>Send Location (Address)</label><textarea id="d-loc" rows="2"></textarea></div>
-                </div>
-
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-box"></i> Coffin & Karo</div>
-                    <div class="form-group">
-                        <label>Select Coffin</label>
-                        <select id="d-coffin"><option>Metal Elite (P50,000)</option><option>Solid Wood (P30,000)</option><option>Standard (P15,000)</option></select>
-                    </div>
-                    <div class="form-group"><label>Custom Color</label><input type="color" id="d-color" value="#ffffff" style="height: 45px; padding: 5px;"></div>
-                    <div class="form-group">
-                        <label>Karo (Vehicle)</label>
-                        <select id="d-karo"><option>White Cadillac Hearse</option><option>Classic Horse Carriage</option><option>Modern Van</option></select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-tshirt"></i> Custom Attire</div>
-                    <div class="form-group">
-                        <label>Clothing Type</label>
-                        <select id="d-attire"><option>Custom Barong</option><option>Formal Dress / Gown</option></select>
-                    </div>
-                    <div class="form-group"><label>Shoes Size</label><input type="number" id="d-shoes"></div>
-                    <div class="form-group">
-                        <label>Flowers Arrangement</label>
-                        <select id="d-flowers"><option>Set A (Lilies & Mums)</option><option>Set B (Roses & Orchids)</option></select>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="section-title"><i class="fas fa-credit-card"></i> Payment & Submit</div>
-                    <div class="form-group">
-                        <label>Payment Mode</label>
-                        <select id="d-pay"><option>G-Cash (09123456789)</option><option>Cash on Counter</option></select>
-                    </div>
-                    <p style="font-size: 11px; color: #888;">*By clicking save, you agree to our funeral terms.</p>
-                    <button class="btn-save" onclick="saveData()">CONFIRM REGISTRATION</button>
-                </div>
+        <div id="admin-view" style="display:none;">
+            <div class="stats-grid">
+                <div class="stat-box"><span class="stat-label">Total Bookings</span><span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Bronze Sales</span><span id="stat-bronze" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Gold Sales</span><span id="stat-gold" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Elite Sales</span><span id="stat-elite" class="stat-val">0</span></div>
             </div>
-        </div>
 
-        <div id="admin-view" style="display: none;">
-            <div class="card">
-                <div class="section-title"><i class="fas fa-list"></i> Registered Funeral Appointments</div>
-                <div style="overflow-x: auto;">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Deceased Name</th>
-                                <th>Coffin/Karo</th>
-                                <th>Payment</th>
-                                <th>Location</th>
-                                <th>Status</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-table-body">
-                            </tbody>
-                    </table>
+            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
+                <div class="card">
+                    <div style="font-weight: 900; margin-bottom: 20px;">Sales Distribution</div>
+                    <canvas id="salesChart" height="250"></canvas>
+                </div>
+                <div class="card">
+                    <div style="font-weight: 900; margin-bottom: 20px;">Recent Registrations</div>
+                    <div style="overflow-x: auto;">
+                        <table>
+                            <thead><tr><th>Deceased</th><th>Package</th><th>Payment</th><th>Actions</th></tr></thead>
+                            <tbody id="admin-list"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -123,66 +145,111 @@
 
     <script>
         const session = JSON.parse(localStorage.getItem('loginSession'));
+        let selectedPackage = { name: '', price: 0 };
+        let map, marker;
 
         window.onload = function() {
             if(!session) window.location.href = 'index.html';
-            document.getElementById('user-name').innerText = session.name;
+            document.getElementById('user-tag').innerText = session.name;
 
             if(session.role === 'admin') {
                 document.getElementById('admin-view').style.display = 'block';
-                document.getElementById('main-title').innerText = "Admin Management";
-                document.getElementById('menu-text').innerHTML = '<i class="fas fa-file-invoice"></i> Records';
-                loadAdminData();
+                updateAnalytics();
+                renderSalesChart();
             } else {
                 document.getElementById('user-view').style.display = 'block';
-                document.getElementById('main-title').innerText = "Book an Appointment";
+                initMap();
             }
         };
 
-        function saveData() {
-            const entry = {
+        // --- FEATURE 3: PACKAGE LOGIC ---
+        function selectPkg(name, price, el) {
+            selectedPackage = { name, price };
+            document.querySelectorAll('.package-card').forEach(c => c.classList.remove('package-selected'));
+            el.classList.add('package-selected');
+            document.getElementById('sum-pkg').innerText = name;
+            document.getElementById('sum-price').innerText = '₱' + price.toLocaleString();
+        }
+
+        // --- FEATURE 5: MAP LOGIC (Leaflet) ---
+        function initMap() {
+            // Default center: Manila/Philippines area
+            map = L.map('map').setView([14.5995, 120.9842], 13);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+            marker = L.marker([14.5995, 120.9842], {draggable: true}).addTo(map);
+            
+            marker.on('dragend', function() {
+                const pos = marker.getLatLng();
+                document.getElementById('reg-coords').value = `${pos.lat},${pos.lng}`;
+            });
+        }
+
+        function processOrder() {
+            const name = document.getElementById('reg-name').value;
+            if(!name || !selectedPackage.name) return alert("Please fill name and select a package");
+
+            const order = {
                 id: Date.now(),
-                name: document.getElementById('d-name').value,
-                phone: document.getElementById('d-phone').value,
-                loc: document.getElementById('d-loc').value,
-                coffin: document.getElementById('d-coffin').value,
-                color: document.getElementById('d-color').value,
-                karo: document.getElementById('d-karo').value,
-                pay: document.getElementById('d-pay').value,
+                deceased: name,
+                pkg: selectedPackage.name,
+                price: selectedPackage.price,
+                pay: document.getElementById('reg-pay').value,
+                coords: document.getElementById('reg-coords').value || "14.59, 120.98",
                 date: new Date().toLocaleDateString()
             };
 
-            if(!entry.name) return alert("Please enter deceased name");
-
-            let list = JSON.parse(localStorage.getItem('funeral_data')) || [];
-            list.push(entry);
-            localStorage.setItem('funeral_data', JSON.stringify(list));
-            alert("Success! Your registration has been sent to the Admin.");
+            let data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
+            data.push(order);
+            localStorage.setItem('funeral_pro_data', JSON.stringify(data));
+            alert("Order Confirmed! Admin will contact you shortly.");
             location.reload();
         }
 
-        function loadAdminData() {
-            const list = JSON.parse(localStorage.getItem('funeral_data')) || [];
-            const body = document.getElementById('admin-table-body');
-            body.innerHTML = list.map(item => `
+        // --- FEATURE 4: ADMIN ANALYTICS ---
+        function updateAnalytics() {
+            const data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
+            document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('stat-bronze').innerText = data.filter(i => i.pkg === 'Bronze').length;
+            document.getElementById('stat-gold').innerText = data.filter(i => i.pkg === 'Gold').length;
+            document.getElementById('stat-elite').innerText = data.filter(i => i.pkg === 'Elite').length;
+
+            const list = document.getElementById('admin-list');
+            list.innerHTML = data.map(i => `
                 <tr>
-                    <td><b>${item.name}</b><br><small>${item.phone}</small></td>
-                    <td>${item.coffin} <br> <span style="font-size:10px; color:#888;">Vehicle: ${item.karo}</span></td>
-                    <td><span class="badge" style="background:#e3fcef; color:#00b894;">${item.pay}</span></td>
-                    <td style="font-size:11px;">${item.loc}</td>
-                    <td><span style="font-size:10px; color:#888;">${item.date}</span></td>
-                    <td><button class="delete-btn" onclick="deleteEntry(${item.id})"><i class="fas fa-trash-alt"></i></button></td>
+                    <td><b>${i.deceased}</b></td>
+                    <td><small>${i.pkg}</small></td>
+                    <td><span style="color:var(--main); font-weight:bold">${i.pay}</span></td>
+                    <td><button onclick="deleteEntry(${i.id})" style="border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
                 </tr>
             `).join('');
         }
 
+        function renderSalesChart() {
+            const data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
+            const counts = { Bronze: 0, Gold: 0, Elite: 0 };
+            data.forEach(i => counts[i.pkg]++);
+
+            const ctx = document.getElementById('salesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Bronze', 'Gold', 'Elite'],
+                    datasets: [{
+                        data: [counts.Bronze, counts.Gold, counts.Elite],
+                        backgroundColor: ['#cd7f32', '#facc15', '#00b894'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { maintainAspectRatio: false }
+            });
+        }
+
         function deleteEntry(id) {
-            if(confirm("Are you sure you want to delete this record?")) {
-                let list = JSON.parse(localStorage.getItem('funeral_data')) || [];
-                list = list.filter(i => i.id !== id);
-                localStorage.setItem('funeral_data', JSON.stringify(list));
-                loadAdminData();
-            }
+            if(!confirm("Delete this record?")) return;
+            let data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
+            data = data.filter(i => i.id !== id);
+            localStorage.setItem('funeral_pro_data', JSON.stringify(data));
+            location.reload();
         }
 
         function logout() {
@@ -191,5 +258,4 @@
         }
     </script>
 </body>
-  </html>
-  
+</html>
