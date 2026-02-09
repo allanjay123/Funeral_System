@@ -3,138 +3,161 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Eternal Care Elite | System</title>
+    <title>Eternal Care Elite | Full System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
-        :root { --main: #00b894; --sidebar: #0f1423; --bg: #f8f9fc; }
+        :root { --main: #00b894; --sidebar: #0f1423; --bg: #f8f9fc; --gold: #facc15; }
         body { margin: 0; font-family: 'Inter', sans-serif; display: flex; height: 100vh; background: var(--bg); color: #333; }
         
+        /* SIDEBAR */
         .sidebar { width: 260px; background: var(--sidebar); color: white; display: flex; flex-direction: column; padding: 20px 0; }
         .sidebar-brand { padding: 0 25px 30px; font-size: 24px; font-weight: 900; color: var(--main); }
         .sidebar-item { padding: 15px 25px; cursor: pointer; display: flex; align-items: center; gap: 15px; color: #a4b0be; transition: 0.3s; }
         .sidebar-item:hover, .active { background: rgba(0,184,148,0.15); color: var(--main); border-right: 4px solid var(--main); }
 
+        /* CONTENT Area */
         .content { flex: 1; padding: 30px; overflow-y: auto; }
-        .card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; }
+        .card { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); margin-bottom: 25px; border: 1px solid #edf2f7; }
+        .section-title { font-weight: 900; margin-bottom: 20px; color: var(--sidebar); display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f1f1f1; padding-bottom: 10px; }
         
         /* FEATURE 3: PACKAGE STYLE */
         .package-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-bottom: 20px; }
-        .package-card { border: 2px solid #eee; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
-        .package-card:hover, .package-selected { border-color: var(--main); background: #f0fffb; }
-        .package-card h4 { margin: 10px 0; color: var(--sidebar); }
-        .package-price { font-weight: 900; color: var(--main); font-size: 1.2rem; }
+        .package-card { border: 2px solid #eee; border-radius: 12px; padding: 15px; text-align: center; cursor: pointer; transition: 0.3s; position: relative; }
+        .package-card:hover, .package-selected { border-color: var(--main); background: #f0fffb; transform: translateY(-5px); }
+        .package-selected::after { content: '\f058'; font-family: 'Font Awesome 5 Free'; font-weight: 900; position: absolute; top: 10px; right: 10px; color: var(--main); }
 
         /* FEATURE 5: MAP STYLE */
-        #map { height: 250px; border-radius: 12px; margin-top: 10px; border: 2px solid #eee; }
+        #map { height: 250px; border-radius: 12px; margin-top: 10px; border: 2px solid #eee; z-index: 1; }
 
-        /* ANALYTICS GRID */
+        /* ANALYTICS */
         .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 25px; }
-        .stat-box { background: white; padding: 20px; border-radius: 12px; border-bottom: 4px solid var(--main); }
-        .stat-val { font-size: 24px; font-weight: 900; display: block; }
-        .stat-label { font-size: 12px; color: #888; text-transform: uppercase; }
+        .stat-box { background: white; padding: 20px; border-radius: 12px; border-bottom: 4px solid var(--main); box-shadow: 0 4px 6px rgba(0,0,0,0.02); }
+        .stat-val { font-size: 24px; font-weight: 900; display: block; color: var(--sidebar); }
+        .stat-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 1px; }
 
+        /* FORM CONTROLS */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; font-size: 11px; font-weight: 800; color: #666; margin-bottom: 5px; text-transform: uppercase; }
-        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; transition: 0.3s; }
+        input:focus { border-color: var(--main); }
         
-        .btn-main { background: var(--main); color: white; border: none; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; transition: 0.3s; }
-        .btn-main:hover { background: #009476; transform: translateY(-2px); }
+        .btn-main { background: var(--main); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px; box-shadow: 0 4px 14px rgba(0, 184, 148, 0.4); }
 
+        /* TABLE */
         table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; color: #888; font-size: 12px; border-bottom: 2px solid #f4f4f4; }
+        th { text-align: left; padding: 15px; color: #888; font-size: 12px; border-bottom: 2px solid #f4f4f4; text-transform: uppercase; }
         td { padding: 15px; border-bottom: 1px solid #eee; font-size: 14px; }
-
-        
+        .badge { padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; }
     </style>
 </head>
 <body>
 
     <div class="sidebar">
-        <div class="sidebar-brand">SELLIO <span style="color:white; font-size: 12px;">PRO</span></div>
-        <div class="sidebar-item active" id="nav-dash" onclick="location.reload()"><i class="fas fa-chart-pie"></i><span>Dashboard</span></div>
-        <div class="sidebar-item" onclick="logout()" style="margin-top: auto;"><i class="fas fa-power-off"></i><span>Logout</span></div>
+        <div class="sidebar-brand">ETERNAL <span style="color:white; font-size: 12px;">ELITE</span></div>
+        <div class="sidebar-item active" id="nav-dash" onclick="location.reload()"><i class="fas fa-home"></i><span>Dashboard</span></div>
+        <div class="sidebar-item" onclick="logout()" style="margin-top: auto;"><i class="fas fa-sign-out-alt"></i><span>Logout</span></div>
     </div>
 
     <div class="content">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-            <h1 id="view-title">Funeral Hub</h1>
-            <div id="user-tag" style="background: white; padding: 10px 20px; border-radius: 30px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); font-weight: bold; font-size: 14px;"></div>
+            <h1 id="view-title" style="font-weight: 900; color: var(--sidebar);">Funeral Management</h1>
+            <div id="user-tag" style="background: white; padding: 10px 20px; border-radius: 30px; font-weight: bold; border: 1px solid #eee;"></div>
         </div>
 
         <div id="user-view" style="display:none;">
-            <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 25px;">
+            <div class="grid-2" style="grid-template-columns: 1.6fr 1fr;">
                 <div>
                     <div class="card">
-                        <div style="font-weight: 900; margin-bottom: 20px;"><i class="fas fa-layer-group"></i> FEATURE 3: SELECT PACKAGE</div>
+                        <div class="section-title"><i class="fas fa-box-open"></i> 1. Choose Funeral Package</div>
                         <div class="package-container">
                             <div class="package-card" onclick="selectPkg('Bronze', 25000, this)">
-                                <i class="fas fa-medal" style="color:#cd7f32"></i>
+                                <i class="fas fa-award" style="color:#cd7f32; font-size: 24px;"></i>
                                 <h4>BRONZE</h4>
-                                <span class="package-price">₱25k</span>
-                                <p style="font-size: 10px;">Wood Coffin + Basic Karo</p>
+                                <span class="package-price">₱25,000</span>
                             </div>
                             <div class="package-card" onclick="selectPkg('Gold', 55000, this)">
-                                <i class="fas fa-medal" style="color:#facc15"></i>
+                                <i class="fas fa-award" style="color:var(--gold); font-size: 24px;"></i>
                                 <h4>GOLD</h4>
-                                <span class="package-price">₱55k</span>
-                                <p style="font-size: 10px;">Metal Coffin + Modern Hearse</p>
+                                <span class="package-price">₱55,000</span>
                             </div>
                             <div class="package-card" onclick="selectPkg('Elite', 120000, this)">
-                                <i class="fas fa-crown" style="color:#00b894"></i>
+                                <i class="fas fa-crown" style="color:var(--main); font-size: 24px;"></i>
                                 <h4>ELITE</h4>
-                                <span class="package-price">₱120k</span>
-                                <p style="font-size: 10px;">Premium Marble + Limousine</p>
+                                <span class="package-price">₱120,000</span>
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Full Name of Deceased</label>
-                            <input type="text" id="reg-name" placeholder="Enter name...">
                         </div>
                     </div>
 
                     <div class="card">
-                        <div style="font-weight: 900; margin-bottom: 15px;"><i class="fas fa-map-marker-alt"></i> FEATURE 5: PIN LOCATION</div>
-                        <p style="font-size: 12px; color: #666;">Drag the map to pinpoint the exact location for the service.</p>
+                        <div class="section-title"><i class="fas fa-palette"></i> 2. Custom Details (Coffin, Attire, Flowers)</div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Deceased Name</label><input type="text" id="reg-name" placeholder="Name"></div>
+                            <div class="form-group"><label>Custom Coffin Color</label><input type="color" id="reg-color" value="#ffffff" style="height:45px"></div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group">
+                                <label>Flower Design</label>
+                                <select id="reg-flowers"><option>Set A: White Lilies</option><option>Set B: Mixed Roses</option><option>Set C: Orchids</option></select>
+                            </div>
+                            <div class="form-group">
+                                <label>Attire Selection</label>
+                                <select id="reg-attire"><option>Barong Tagalog</option><option>Evening Gown</option><option>Military Uniform</option></select>
+                            </div>
+                        </div>
+                        <div class="grid-2">
+                            <div class="form-group"><label>Shoes Size</label><input type="number" id="reg-shoes" placeholder="Size"></div>
+                            <div class="form-group"><label>Karo (Vehicle)</label><select id="reg-karo"><option>Classic Hearse</option><option>Modern SUV</option><option>Horse Carriage</option></select></div>
+                        </div>
+                        <div class="form-group"><label>Tarpaulin Message</label><textarea id="reg-tarp" rows="2" placeholder="In Loving Memory of..."></textarea></div>
+                    </div>
+
+                    <div class="card">
+                        <div class="section-title"><i class="fas fa-map-marked-alt"></i> 3. Service Location</div>
                         <div id="map"></div>
                         <input type="hidden" id="reg-coords">
                     </div>
                 </div>
 
-                <div class="card">
-                    <div style="font-weight: 900; margin-bottom: 20px;">Order Summary</div>
-                    <div class="form-group"><label>Attire Customization</label><select id="reg-attire"><option>Barong Tagalog</option><option>White Gown</option></select></div>
-                    <div class="form-group"><label>Payment Method</label><select id="reg-pay"><option>G-Cash (0912-345-6789)</option><option>Bank Transfer</option></select></div>
-                    <div id="summary-box" style="background: #f8f9fc; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                        <div style="display:flex; justify-content: space-between;"><span>Package:</span> <b id="sum-pkg">-</b></div>
-                        <div style="display:flex; justify-content: space-between; margin-top: 10px;"><span>Total:</span> <b id="sum-price" style="color:var(--main)">₱0</b></div>
+                <div style="position: sticky; top: 30px;">
+                    <div class="card" style="background: var(--sidebar); color: white;">
+                        <div class="section-title" style="color: white; border-color: #333;">Order Summary</div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:10px;"><span>Package:</span> <b id="sum-pkg" style="color:var(--main)">-</b></div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:20px;"><span>Total Price:</span> <b id="sum-price" style="color:var(--gold); font-size: 20px;">₱0</b></div>
+                        
+                        <div class="form-group">
+                            <label style="color: #aaa;">Payment Method</label>
+                            <select id="reg-pay" style="background:#222; color:white; border:none;"><option>G-Cash (09123456789)</option><option>Cash on Counter</option></select>
+                        </div>
+                        <div class="form-group"><label style="color: #aaa;">Contact Number</label><input type="text" id="reg-phone" placeholder="09xx..." style="background:#222; color:white; border:none;"></div>
+                        
+                        <button class="btn-main" onclick="processOrder()">FINALIZE BOOKING</button>
                     </div>
-                    <button class="btn-main" onclick="processOrder()">PLACE BOOKING</button>
                 </div>
             </div>
         </div>
 
         <div id="admin-view" style="display:none;">
             <div class="stats-grid">
-                <div class="stat-box"><span class="stat-label">Total Bookings</span><span id="stat-total" class="stat-val">0</span></div>
-                <div class="stat-box"><span class="stat-label">Bronze Sales</span><span id="stat-bronze" class="stat-val">0</span></div>
-                <div class="stat-box"><span class="stat-label">Gold Sales</span><span id="stat-gold" class="stat-val">0</span></div>
-                <div class="stat-box"><span class="stat-label">Elite Sales</span><span id="stat-elite" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Total Appointments</span><span id="stat-total" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Total Revenue</span><span id="stat-revenue" class="stat-val">₱0</span></div>
+                <div class="stat-box"><span class="stat-label">Active Orders</span><span id="stat-active" class="stat-val">0</span></div>
+                <div class="stat-box"><span class="stat-label">Popular Pkg</span><span id="stat-popular" class="stat-val">-</span></div>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 20px;">
+            <div class="grid-2" style="grid-template-columns: 1fr 2fr;">
                 <div class="card">
-                    <div style="font-weight: 900; margin-bottom: 20px;">Sales Distribution</div>
-                    <canvas id="salesChart" height="250"></canvas>
+                    <div class="section-title">Package Sales Chart</div>
+                    <canvas id="salesChart" height="300"></canvas>
                 </div>
                 <div class="card">
-                    <div style="font-weight: 900; margin-bottom: 20px;">Recent Registrations</div>
+                    <div class="section-title">All Funeral Records (CRUD)</div>
                     <div style="overflow-x: auto;">
                         <table>
-                            <thead><tr><th>Deceased</th><th>Package</th><th>Payment</th><th>Actions</th></tr></thead>
+                            <thead><tr><th>Deceased</th><th>Package</th><th>Customs</th><th>Payment</th><th>Actions</th></tr></thead>
                             <tbody id="admin-list"></tbody>
                         </table>
                     </div>
@@ -150,19 +173,19 @@
 
         window.onload = function() {
             if(!session) window.location.href = 'index.html';
-            document.getElementById('user-tag').innerText = session.name;
+            document.getElementById('user-tag').innerHTML = `<i class="fas fa-user-circle"></i> ${session.name}`;
 
             if(session.role === 'admin') {
                 document.getElementById('admin-view').style.display = 'block';
-                updateAnalytics();
-                renderSalesChart();
+                document.getElementById('view-title').innerText = "Admin Analytics Dashboard";
+                updateAdminDashboard();
             } else {
                 document.getElementById('user-view').style.display = 'block';
+                document.getElementById('view-title').innerText = "Personalized Funeral Booking";
                 initMap();
             }
         };
 
-        // --- FEATURE 3: PACKAGE LOGIC ---
         function selectPkg(name, price, el) {
             selectedPackage = { name, price };
             document.querySelectorAll('.package-card').forEach(c => c.classList.remove('package-selected'));
@@ -171,73 +194,86 @@
             document.getElementById('sum-price').innerText = '₱' + price.toLocaleString();
         }
 
-        // --- FEATURE 5: MAP LOGIC (Leaflet) ---
         function initMap() {
-            // Default center: Manila/Philippines area
-            map = L.map('map').setView([14.5995, 120.9842], 13);
+            map = L.map('map').setView([14.5995, 120.9842], 12);
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
             marker = L.marker([14.5995, 120.9842], {draggable: true}).addTo(map);
-            
             marker.on('dragend', function() {
                 const pos = marker.getLatLng();
-                document.getElementById('reg-coords').value = `${pos.lat},${pos.lng}`;
+                document.getElementById('reg-coords').value = `${pos.lat.toFixed(4)},${pos.lng.toFixed(4)}`;
             });
         }
 
         function processOrder() {
-            const name = document.getElementById('reg-name').value;
-            if(!name || !selectedPackage.name) return alert("Please fill name and select a package");
-
-            const order = {
+            const data = {
                 id: Date.now(),
-                deceased: name,
+                deceased: document.getElementById('reg-name').value,
                 pkg: selectedPackage.name,
                 price: selectedPackage.price,
+                color: document.getElementById('reg-color').value,
+                flowers: document.getElementById('reg-flowers').value,
+                attire: document.getElementById('reg-attire').value,
+                shoes: document.getElementById('reg-shoes').value,
+                tarp: document.getElementById('reg-tarp').value,
+                karo: document.getElementById('reg-karo').value,
                 pay: document.getElementById('reg-pay').value,
                 coords: document.getElementById('reg-coords').value || "14.59, 120.98",
-                date: new Date().toLocaleDateString()
+                phone: document.getElementById('reg-phone').value
             };
 
-            let data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
-            data.push(order);
-            localStorage.setItem('funeral_pro_data', JSON.stringify(data));
-            alert("Order Confirmed! Admin will contact you shortly.");
+            if(!data.deceased || !data.pkg) return alert("Please fill up the Deceased Name and Select a Package.");
+
+            let records = JSON.parse(localStorage.getItem('funeral_master_data')) || [];
+            records.push(data);
+            localStorage.setItem('funeral_master_data', JSON.stringify(records));
+            alert("Success! Appointment sent to the system.");
             location.reload();
         }
 
-        // --- FEATURE 4: ADMIN ANALYTICS ---
-        function updateAnalytics() {
-            const data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
-            document.getElementById('stat-total').innerText = data.length;
-            document.getElementById('stat-bronze').innerText = data.filter(i => i.pkg === 'Bronze').length;
-            document.getElementById('stat-gold').innerText = data.filter(i => i.pkg === 'Gold').length;
-            document.getElementById('stat-elite').innerText = data.filter(i => i.pkg === 'Elite').length;
+        function updateAdminDashboard() {
+            const data = JSON.parse(localStorage.getItem('funeral_master_data')) || [];
+            let totalRevenue = 0;
+            const counts = { Bronze: 0, Gold: 0, Elite: 0 };
 
-            const list = document.getElementById('admin-list');
-            list.innerHTML = data.map(i => `
-                <tr>
-                    <td><b>${i.deceased}</b></td>
-                    <td><small>${i.pkg}</small></td>
-                    <td><span style="color:var(--main); font-weight:bold">${i.pay}</span></td>
-                    <td><button onclick="deleteEntry(${i.id})" style="border:none; color:red; cursor:pointer;"><i class="fas fa-trash"></i></button></td>
-                </tr>
-            `).join('');
+            const tbody = document.getElementById('admin-list');
+            tbody.innerHTML = data.map(i => {
+                totalRevenue += i.price;
+                counts[i.pkg]++;
+                return `
+                    <tr>
+                        <td><b>${i.deceased}</b><br><small>${i.phone}</small></td>
+                        <td><span class="badge" style="background:#eee">${i.pkg}</span><br>₱${i.price.toLocaleString()}</td>
+                        <td style="font-size:11px;">
+                            Color: <span style="display:inline-block;width:10px;height:10px;background:${i.color}"></span><br>
+                            Attire: ${i.attire} (${i.shoes})<br>
+                            Tarp: ${i.tarp.substring(0,15)}...
+                        </td>
+                        <td><span class="badge" style="background:rgba(0,184,148,0.1);color:var(--main)">${i.pay}</span></td>
+                        <td><button onclick="deleteEntry(${i.id})" style="border:none;background:none;color:red;cursor:pointer;"><i class="fas fa-trash"></i></button></td>
+                    </tr>
+                `;
+            }).join('');
+
+            document.getElementById('stat-total').innerText = data.length;
+            document.getElementById('stat-revenue').innerText = '₱' + totalRevenue.toLocaleString();
+            document.getElementById('stat-active').innerText = data.length;
+            
+            const maxVal = Math.max(counts.Bronze, counts.Gold, counts.Elite);
+            const popular = Object.keys(counts).find(key => counts[key] === maxVal && maxVal > 0) || "-";
+            document.getElementById('stat-popular').innerText = popular;
+
+            renderChart(counts);
         }
 
-        function renderSalesChart() {
-            const data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
-            const counts = { Bronze: 0, Gold: 0, Elite: 0 };
-            data.forEach(i => counts[i.pkg]++);
-
-            const ctx = document.getElementById('salesChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
+        function renderChart(counts) {
+            new Chart(document.getElementById('salesChart'), {
+                type: 'bar',
                 data: {
                     labels: ['Bronze', 'Gold', 'Elite'],
                     datasets: [{
+                        label: 'Orders',
                         data: [counts.Bronze, counts.Gold, counts.Elite],
-                        backgroundColor: ['#cd7f32', '#facc15', '#00b894'],
-                        borderWidth: 0
+                        backgroundColor: ['#cd7f32', '#facc15', '#00b894']
                     }]
                 },
                 options: { maintainAspectRatio: false }
@@ -245,10 +281,10 @@
         }
 
         function deleteEntry(id) {
-            if(!confirm("Delete this record?")) return;
-            let data = JSON.parse(localStorage.getItem('funeral_pro_data')) || [];
+            if(!confirm("Delete this record permanently?")) return;
+            let data = JSON.parse(localStorage.getItem('funeral_master_data')) || [];
             data = data.filter(i => i.id !== id);
-            localStorage.setItem('funeral_pro_data', JSON.stringify(data));
+            localStorage.setItem('funeral_master_data', JSON.stringify(data));
             location.reload();
         }
 
@@ -257,5 +293,6 @@
             window.location.href = 'index.html';
         }
     </script>
-</body>
+</body>    
 </html>
+                                    
